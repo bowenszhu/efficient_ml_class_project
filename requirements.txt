@@ -1,0 +1,9 @@
+# Numpy less than 2
+numpy<2
+torch
+torchvision
+torchaudio
+transformers
+accelerate
+datasets
+zstandard
