@@ -14,7 +14,7 @@ else
 fi
 validation_data_url="https://huggingface.co/datasets/mit-han-lab/pile-val-backup/resolve/main/val.jsonl.zst"
 validation_data_path="$smoothquant_path/act_scales/val.jsonl.zst"
-if [ ! -d "$validation_data_path" ]; then
+if [ ! -f "$validation_data_path" ]; then
     wget $validation_data_url -O $validation_data_path
 fi
 

@@ -8,3 +8,7 @@ __pycache__
 # OS ignores
 .DS_Store
 Thumbs.db
+
+# Data
+smoothquant/act_scales/*.pt
+smoothquant/act_scales/*.zst
