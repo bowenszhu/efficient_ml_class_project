@@ -1,0 +1,10 @@
+venv
+# Common ignores
+*.pyc
+__pycache__
+# IDE ignores
+.idea
+.vscode
+# OS ignores
+.DS_Store
+Thumbs.db
