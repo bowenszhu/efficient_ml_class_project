@@ -10,5 +10,4 @@ __pycache__
 Thumbs.db
 
 # Data
-smoothquant/act_scales/*.pt
-smoothquant/act_scales/*.zst
+smoothquant/act_scales/val.jsonl.zst

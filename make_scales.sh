@@ -1,6 +1,11 @@
 smoothquant_path=smoothquant
 # Get model short name from the first argument
 model_short_name=$1
+pt_file="$smoothquant_path/act_scales/$model_short_name.pt"
+if [ -f "$pt_file" ]; then
+    echo "Act scales already exist for $model_short_name"
+    exit 0
+fi
 # Get huggingface model name from the short name
 # Copilot: If startswith opt, then path is facebook/$model_short_name
 # Copilot: If startswith llama, then path is meta-llama/$model_short_name-hf
