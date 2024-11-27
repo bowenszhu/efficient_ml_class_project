@@ -1,4 +1,5 @@
 venv
+.env
 # Common ignores
 *.pyc
 __pycache__

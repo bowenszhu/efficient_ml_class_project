@@ -11,10 +11,12 @@ fi
 # Copilot: If startswith llama, then path is meta-llama/$model_short_name-hf
 if [[ $model_short_name == opt* ]]; then
     model_full_name="facebook/$model_short_name"
-elif [[ $model_short_name == llama* ]]; then
+elif [[ $model_short_name == llama-2* ]]; then
     model_full_name="meta-llama/$model_short_name-hf"
+elif [[ $model_short_name == llama-3* ]]; then
+    model_full_name="meta-llama/$model_short_name"
 else
-    echo "Model short name must start with opt or llama"
+    echo "Model short name must start with opt or llama-2 or llama-3"
     exit 1
 fi
 validation_data_url="https://huggingface.co/datasets/mit-han-lab/pile-val-backup/resolve/main/val.jsonl.zst"
