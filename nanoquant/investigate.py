@@ -106,7 +106,7 @@ class Investigation:
         assert os.path.exists(scales_path), f"Cannot find the act scales at {scales_path}"
         self.smooth_act_scales = torch.load(scales_path)
         # AWQ scales.
-        assert short_model_name in ["opt-125m", "opt-6.7b", "opt-13b", "llama2-7b"], "Only supported models. Include more."
+        assert short_model_name in ["opt-125m", "opt-6.7b", "opt-13b", "llama-2-7b"], "Only supported models for AWQ. Include more."
         if q_protect:
             awq_zoo = "mit-han-lab/awq-model-zoo"
             awq_pt_name = f"{short_model_name}-w4-g128.pt"
@@ -296,7 +296,7 @@ def setup_name(setup):
     return base_name
 
 def make_baselines():
-    return ["fp16", "awq", "smoothquant", "smoothquant-g", "w4a4", "w8a8"]
+    return ["fp16", "awq", "smoothquant", "smoothquant-g", "w4a4", "smooth-w4a4", "w8a8"]
 
 
 def make_setups():
@@ -315,10 +315,6 @@ def make_setups():
     setups.append(make_setup(n_bits, q_group_size, q_protect, q_protection_scale, q_protection_ratio, q_smoothing_strength))
     # Mixed-precision activation protection
     q_protection_scale = 0.0
-    q_protection_ratio = 0.03
-    setups.append(make_setup(n_bits, q_group_size, q_protect, q_protection_scale, q_protection_ratio, q_smoothing_strength))
-    # Scaled protection
-    q_protection_scale = 2.0
     q_protection_ratio = 0.03
     setups.append(make_setup(n_bits, q_group_size, q_protect, q_protection_scale, q_protection_ratio, q_smoothing_strength))
     return setups
@@ -356,6 +352,9 @@ def sweep(short_model_name, repo_dir, save_dir, perp=True):
         elif baseline == "w4a4":
             investigation = Investigation(short_model_name, repo_dir, n_bits=4, q_group_size=0, q_protect=False)
             res = investigation.evaluate_base_quantized_model(perp=perp)
+        elif baseline == "smooth-w4a4":
+            investigation = Investigation(short_model_name, repo_dir, n_bits=4, q_group_size=0, q_protect=False)
+            res = investigation.evaluate_base_smooth_model(perp=perp)
         results[baseline] = res
         print(f"{baseline}: {res}")
         with open(result_file, "wb") as f:
@@ -364,7 +363,7 @@ def sweep(short_model_name, repo_dir, save_dir, perp=True):
     for setup in setups:
         setup_key = str(setup)
         base_expt_name = setup_name(setup)
-        if setup_key in results and not "-Act" in base_expt_name:
+        if setup_key in results:
             print(f"Setup {base_expt_name} already run. Results={results[setup_key]['q_res']}, SmoothResults={results[setup_key]['q_smooth_res']}")
             continue
         print(f"Running setup {base_expt_name}")
