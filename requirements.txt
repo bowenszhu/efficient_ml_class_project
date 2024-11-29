@@ -7,3 +7,4 @@ transformers
 accelerate
 datasets
 zstandard
+huggingface_hub
