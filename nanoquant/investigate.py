@@ -330,7 +330,6 @@ def sweep(short_model_name, repo_dir, save_dir, perp=True):
         results = {}
     baselines = make_baselines()
     for baseline in baselines:
-        break
         if baseline in results:
             print(f"Baseline {baseline} already run. Results: {results[baseline]}")
             continue
@@ -364,9 +363,7 @@ def sweep(short_model_name, repo_dir, save_dir, perp=True):
     for setup in setups:
         setup_key = str(setup)
         base_expt_name = setup_name(setup)
-        if "-Mixed-Act" not in base_expt_name:
-            continue
-        if setup_key in results and "-Mixed-Act" not in base_expt_name:
+        if setup_key in results:
             print(f"Setup {base_expt_name} already run. Results={results[setup_key]['q_res']}, SmoothResults={results[setup_key]['q_smooth_res']}")
             continue
         print(f"Running setup {base_expt_name}")
