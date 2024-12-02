@@ -1,6 +1,7 @@
 import torch
 import tqdm
 import os
+import gc
 from torch import nn
 from transformers import GPT2Tokenizer
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -313,10 +314,10 @@ def make_setups():
     q_protection_scale = 0.0
     q_protection_ratio = 0.0
     setups.append(make_setup(n_bits, q_group_size, q_protect, q_protection_scale, q_protection_ratio, q_smoothing_strength))
-    # Mixed-precision activation protection
-    q_protection_scale = 0.0
-    q_protection_ratio = 0.03
-    setups.append(make_setup(n_bits, q_group_size, q_protect, q_protection_scale, q_protection_ratio, q_smoothing_strength))
+    # # Mixed-precision activation protection
+    # q_protection_scale = 0.0
+    # q_protection_ratio = 0.03
+    # setups.append(make_setup(n_bits, q_group_size, q_protect, q_protection_scale, q_protection_ratio, q_smoothing_strength))
     return setups
 
 
@@ -333,6 +334,10 @@ def sweep(short_model_name, repo_dir, save_dir, perp=True):
         if baseline in results:
             print(f"Baseline {baseline} already run. Results: {results[baseline]}")
             continue
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         print(f"Running baseline {baseline}")
         if baseline == "fp16":
             investigation = Investigation(short_model_name, repo_dir)
@@ -363,16 +368,33 @@ def sweep(short_model_name, repo_dir, save_dir, perp=True):
     for setup in setups:
         setup_key = str(setup)
         base_expt_name = setup_name(setup)
-        if setup_key in results:
+        if setup_key in results and base_expt_name != "W4A4 G128":
             print(f"Setup {base_expt_name} already run. Results={results[setup_key]['q_res']}, SmoothResults={results[setup_key]['q_smooth_res']}")
             continue
-        print(f"Running setup {base_expt_name}")
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         investigation = Investigation(short_model_name, repo_dir, **setup)
-        q_res = investigation.evaluate_setup_model(perp=perp, apply_smooth=False)
         simple_expt_name = f"{base_expt_name}"
+        if simple_expt_name not in results:
+            print(f"Running setup {base_expt_name}")
+            q_res = investigation.evaluate_setup_model(perp=perp, apply_smooth=False)
+            results[simple_expt_name] = q_res
+            with open(result_file, "wb") as f:
+                pkl.dump(results, f)
+        else:
+            q_res = results[simple_expt_name]
         print(f"{simple_expt_name}: {q_res}")
-        q_smooth_res = investigation.evaluate_setup_model(perp=perp, apply_smooth=True)
+        # Smoothed model
         smooth_expt_name = f"Smooth {base_expt_name}"
+        if smooth_expt_name not in results:
+            print(f"Running setup {smooth_expt_name}")
+            q_smooth_res = investigation.evaluate_setup_model(perp=perp, apply_smooth=True)
+            results[smooth_expt_name] = q_smooth_res
+            with open(result_file, "wb") as f:
+                pkl.dump(results, f)
+        else:
+            q_smooth_res = results[smooth_expt_name]
         print(f"{smooth_expt_name}: {q_smooth_res}")
         res = {
             "setup": setup,

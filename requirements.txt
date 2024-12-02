@@ -8,3 +8,5 @@ accelerate
 datasets
 zstandard
 huggingface_hub
+pandas
+altair[save]
