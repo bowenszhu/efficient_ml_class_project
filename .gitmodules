@@ -2,5 +2,5 @@
 	path = smoothquant
 	url = https://github.com/amlatyrngom/smoothquant.git
 [submodule "llm-awq"]
-	path = llm-awq
+	path = llm_awq
 	url = https://github.com/amlatyrngom/llm-awq.git

@@ -8,12 +8,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset
 import pickle as pkl
 # SmoothQuant
-from smoothquant.smooth import smooth_lm
-from smoothquant.fake_quant import WQAQLinear, quantize_model
-from smoothquant.calibration import get_act_scales
+from smoothquant.smoothquant.smooth import smooth_lm
+from smoothquant.smoothquant.fake_quant import WQAQLinear, quantize_model
+from smoothquant.smoothquant.calibration import get_act_scales
 # AWQ
 from huggingface_hub import hf_hub_download
-from awq.quantize.pre_quant import apply_awq
+from llm_awq.awq.quantize.pre_quant import apply_awq
 
 
 class PerplexityEvaluator:
